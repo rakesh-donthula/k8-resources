@@ -1,0 +1,51 @@
+apiVersion: apps:v1
+kind: Deployment
+metadata:
+  name : nginx
+  lables:
+    pupose: dp-demo
+    project: roboshop
+spec:
+  ReplicaSet: 4
+  selector:
+    matchLabels:
+      purpose: headless-svc-demo
+      project: roboshop
+template:
+  metadata:
+    lables:
+      purpose: headless-svc-demo
+      project: roboshop
+  spec:
+    containers:
+      name: nginx
+      image: nginx:latest
+-------
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  type: LoadBalancer
+  selector:
+    purpose: headless-svc-demo
+    project: roboshop
+  ports:
+    - protocol: TCP
+      port: 80
+      ContainerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-headles
+spec:
+  # if a service clusterIP then it is called as headless service
+  clusterIP: None
+  selector:
+    purpose: headless-svc-demo
+    project: roboshop
+  ports:
+    - protocol: TCP
+      port: 80 # service port
+      targetPort: 80 # container port  
